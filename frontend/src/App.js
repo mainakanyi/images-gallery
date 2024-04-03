@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/Header.js';
 import Search from './components/Search.js';
 import ImageCard from './components/ImageCard.js';
+import Welcome from './components/Welcome.js';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 
 const UNSPLASH_KEY = process.env.REACT_APP_UNSPLASH_KEY;
@@ -37,13 +38,17 @@ const App = () => {
       <Header title="Image Gallery2" />
       <Search word={word} setWord={setWord} handleSubmit={handleSearchSubmit} />
       <Container className="mt-4">
-        <Row xs={1} md={2} lg={3}>
-          {images.map((image, i) => (
-            <Col key={i}>
-              <ImageCard deleteImage={handleDeleteImage} image={image} />
-            </Col>
-          ))}
-        </Row>
+        {images.length ? (
+          <Row xs={1} md={2} lg={3}>
+            {images.map((image, i) => (
+              <Col key={i}>
+                <ImageCard deleteImage={handleDeleteImage} image={image} />
+              </Col>
+            ))}
+          </Row>
+        ) : (
+          <Welcome />
+        )}
       </Container>
       {/* {!!images.length && <ImageCard image={images[0]} />} */}
     </div>
