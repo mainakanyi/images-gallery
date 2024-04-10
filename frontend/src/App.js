@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from './components/Header.js';
 import Search from './components/Search.js';
@@ -12,6 +12,19 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:5000';
 const App = () => {
   const [word, setWord] = useState('');
   const [images, setImages] = useState([]);
+
+  useEffect(() => {
+    async function getSavedImages() {
+      try {
+        const res = await axios.get(`${API_URL}/images`);
+        setImages(res.data || []);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    getSavedImages();
+  }, []);
   const headers = {
     'Content-Type': 'application/json',
   };
@@ -36,6 +49,24 @@ const App = () => {
     setImages(images.filter((image) => image.id !== id));
   };
 
+  //Save  Image
+  const handleSaveImage = async (id) => {
+    const ImageToBeSaved = images.find((image) => image.id === id);
+    ImageToBeSaved.saved = true;
+    try {
+      const res = await axios.post(`${API_URL}/images`, ImageToBeSaved);
+      if (res.data?.inserted_id) {
+        setImages(
+          images.map((image) =>
+            image.id === id ? { ...image, saved: true } : image,
+          ),
+        );
+      }
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div>
       <Header title="Image Gallery2" />
@@ -45,7 +76,11 @@ const App = () => {
           <Row xs={1} md={2} lg={3}>
             {images.map((image, i) => (
               <Col key={i}>
-                <ImageCard deleteImage={handleDeleteImage} image={image} />
+                <ImageCard
+                  deleteImage={handleDeleteImage}
+                  saveImage={handleSaveImage}
+                  image={image}
+                />
               </Col>
             ))}
           </Row>
